@@ -52,14 +52,14 @@ class PerfTest
   o_stmt = @o_conn.create_statement()
   o_rs = o_stmt.execute_query(c_query)
   while o_rs.next()
-	  n_job_id = o_rs.get_int("job_id")
-	  c_prg_name = o_rs.get_string("prg_name")
+    n_job_id = o_rs.get_int("job_id")
+    c_prg_name = o_rs.get_string("prg_name")
     c_settings_label = o_rs.get_string("settings_label")
-	  t_run_start = Time.now()
-	  run_cmd = %x{Prevail8.exe ARETE #{c_prg_name} "SettingLabel='#{c_settings_label}'"}
-	  t_run_end = Time.now()
+    t_run_start = Time.now()
+    run_cmd = %x{Prevail8.exe ARETE #{c_prg_name} "SettingLabel='#{c_settings_label}'"}
+    t_run_end = Time.now()
 	  
-	  update_oratable(n_job_id, c_prg_name, t_run_start, t_run_end, n_run_id)
+    update_oratable(n_job_id, c_prg_name, t_run_start, t_run_end, n_run_id)
   end
   c_run_label = ARGV[0]
   t_report_end = Time.now
