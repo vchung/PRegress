@@ -6,7 +6,7 @@ require 'yaml'
 java_import 'oracle.jdbc.OracleDriver'
 java_import 'java.sql.DriverManager'
 
-class PerfTest
+class PRegress
   
   attr :c_work_dir
   
@@ -16,6 +16,7 @@ class PerfTest
     @c_ora_url = @o_ser_conn['ora_url']
     @c_ora_user = @o_ser_conn['ora_user']
     @c_ora_pass = @o_ser_conn['ora_pass']
+	@c_app_folder = @o_ser_conn['app_folder']
     @o_conn = nil
     
     oradriver = OracleDriver.new()
@@ -47,7 +48,6 @@ class PerfTest
   end
   
   def run_routine(n_run_id)
-    Dir.chdir(@c_work_dir)
     c_query = %Q{select job_id, prg_name, settings_label from perfjobs order by job_id}
     o_stmt = @o_conn.create_statement()
     o_rs = o_stmt.execute_query(c_query)
@@ -56,8 +56,10 @@ class PerfTest
       c_prg_name = o_rs.get_string("prg_name")
       c_settings_label = o_rs.get_string("settings_label")
       t_run_start = Time.now()
-      run_cmd = %x{Prevail8.exe ARETE #{c_prg_name} "SettingLabel='#{c_settings_label}'" "DoParallel='.T.'" "ParallelLevel='16'"}
-      t_run_end = Time.now()
+	  Dir.chdir(@c_app_folder) do 
+        run_cmd = %x{Prevail8.exe ARETE #{c_prg_name} "SettingLabel='#{c_settings_label}' DoParallel='.T.' ParallelLevel='16'"}
+      end
+	  t_run_end = Time.now()
 	  
       update_oratable(n_job_id, c_prg_name, t_run_start, t_run_end, n_run_id)
     end
@@ -89,5 +91,5 @@ class PerfTest
 end	
 
 
-oTest = PerfTest.new()
+oTest = PRegress.new()
 oTest.get_runlabel()
