@@ -14,17 +14,17 @@ class PRegress
     @c_ora_url = @o_ser_conn['ora_url']
     @c_ora_user = @o_ser_conn['ora_user']
     @c_ora_pass = @o_ser_conn['ora_pass']
-	@c_app_folder = @o_ser_conn['app_folder']
+	  @c_app_folder = @o_ser_conn['app_folder']
     @o_conn = nil
     
     oradriver = OracleDriver.new()
     DriverManager.registerDriver(oradriver)
     @o_conn = DriverManager.get_connection(@c_ora_url, @c_ora_user, @c_ora_pass)
 	
-	# create connection to vfp table
-	s_driver = "sun.jdbc.odbc.JdbcOdbcDriver"
-	s_url = %Q{jdbc:odbc:Driver={#{@o_ser_conn["vfp_driver"]}};SourceType=DBF;SourceDB=#{@o_ser_conn["custom_folder"]};}
-	@o_custom_conn = DriverManager.getConnection(s_url, "", "")
+    # create connection to vfp table
+    s_driver = "sun.jdbc.odbc.JdbcOdbcDriver"
+    s_url = %Q{jdbc:odbc:Driver={#{@o_ser_conn["vfp_driver"]}};SourceType=DBF;SourceDB=#{@o_ser_conn["custom_folder"]};}
+    @o_custom_conn = DriverManager.getConnection(s_url, "", "")
   end
   
   def update_oratable(n_job_id, c_prg_name, t_run_start, t_run_end, n_run_id)
