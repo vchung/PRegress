@@ -10,7 +10,7 @@ java_import 'java.sql.ResultSet'
 class PRegress
   
   def initialize()
-    @o_ser_conn = YAML.load_file('connection.yml')
+    @o_ser_conn = YAML.load_file('app/connection.yml')
     @c_ora_url = @o_ser_conn['ora_url']
     @c_ora_user = @o_ser_conn['ora_user']
     @c_ora_pass = @o_ser_conn['ora_pass']
@@ -127,7 +127,6 @@ class PRegress
     run_routine(n_run_id)
   end	
 end	
-
 
 oTest = PRegress.new()
 oTest.get_runlabel()
