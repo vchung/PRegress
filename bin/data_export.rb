@@ -95,6 +95,21 @@ class PRegress
     
     JobRunner.run_jobs(o_root_node, @o_logger)
     
+    t_report_end = Time.now
+    c_report_end = t_report_end.strftime("%m/%d/%Y %H:%M:%S")
+    c_sql = %Q{update perfruns set end_time = to_date(:1,'MM/DD/YYYY HH24:MI:SS'), node_id = :2 where run_id = #{n_run_id}}	
+    puts c_sql
+    c_update_stmt = @o_conn.prepare_statement(c_sql)
+    c_update_stmt.set_string(1, c_report_end)
+    c_update_stmt.set_int(2, n_root_node_id)
+ 
+    begin
+    c_update_stmt.executeUpdate()
+    rescue Exception => e
+    #puts e.message
+    #puts e.backtrace.inspect
+    end
+    @o_conn.commit()
   end
   
   def clear_settings()
