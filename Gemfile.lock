@@ -1,0 +1,14 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    json (1.8.1-java)
+    rubytree (0.8.3)
+      json (>= 1.7.5)
+      structured_warnings (>= 0.1.3)
+    structured_warnings (0.1.4)
+
+PLATFORMS
+  java
+
+DEPENDENCIES
+  rubytree
