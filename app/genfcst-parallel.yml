@@ -1,0 +1,23 @@
+Command: 'Prevail8.exe'
+Directory: 'z:/'
+SettingLabel: 'AUTO'
+User: 'AUTO23'
+Serial: true
+
+Roll up Detail Sales History:
+    Program: gDtlRollUp
+Generate Forecasts:
+    Parallel: true
+    Generate Forecasts (Channel 23): 
+        Program: 'gMdlFcstx'
+        SettingLabel: 'AUTO_CHAN23'
+        ByPassFrontForm: '.T.'
+    Generate Forecasts (Channel 62): 
+        Program: 'gMdlFcstx'
+        SettingLabel: 'AUTO_CHAN62'
+    Generate Forecasts (Channel 88): 
+        Program: 'gMdlFcstx'
+        SettingLabel: 'AUTO_CHAN88'
+    Generate Forecasts (Channel 97): 
+        Program: 'gMdlFcstx'
+        SettingLabel: 'AUTO_CHAN97'

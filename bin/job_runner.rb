@@ -5,8 +5,9 @@ java_import 'java.lang.Runnable'
 
 
 module Jobbable
-  include Runnable
   
+  
+  attr_accessor :exec_lbl
   attr_accessor :exec_cmd
   attr_accessor :work_dir
   attr_accessor :job_type
@@ -17,20 +18,32 @@ module Jobbable
   
 end
 
-module BasicJobbable 
+module BasicJobbable
+  include Runnable 
   include Jobbable
   
   def run()
+    
     before_run()
+    
     Dir.chdir(@work_dir) do 
-      %x{#{@exec_cmd}}
+      s_result = %x{#{@exec_cmd}}
     end  
-    after_run()
+    
+    after_run(s_result)
+    
+  end
+  
+  def before_run()
+  end
+  
+  def after_run(s_result=nil)
   end
   
 end
 
 module SerialJobbable
+  include Runnable
   include Jobbable
   
   def run()
@@ -43,6 +56,7 @@ module SerialJobbable
 end
 
 module ParallelJobbable
+  include Runnable
   include Jobbable
   
   def run()
