@@ -17,7 +17,7 @@ module Jobbable
   
 end
 
-module BasicJobable 
+module BasicJobbable 
   include Jobbable
   
   def run()
@@ -30,7 +30,7 @@ module BasicJobable
   
 end
 
-module SerialJobbale
+module SerialJobbable
   include Jobbable
   
   def run()
@@ -42,7 +42,7 @@ module SerialJobbale
   end
 end
 
-module ParallelJobbale
+module ParallelJobbable
   include Jobbable
   
   def run()
