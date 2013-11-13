@@ -1,3 +1,4 @@
+require 'fileutils'
 require 'date'
 
 module TxtJobLoggable
@@ -8,7 +9,7 @@ module TxtJobLoggable
     
     # creates a directory and all its parent directories
     s_dir_name = File.dirname(@log_file)
-    FileUtils.mkdir_p(s_dir_name) if File.directory? s_dir_name
+    FileUtils.mkdir_p(s_dir_name) 
     
     unless s_message.empty?
       File.open(@log_file, "a") do |o_file| 

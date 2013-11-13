@@ -14,6 +14,8 @@ class ScriptRunner
   end
 
   def run_script(s_yaml_file)
+    raise "Yaml file name is not provided" if s_yaml_file.nil?
+    
     h_config = YAML.load_file("app/#{s_yaml_file}.yml")
     s_log_file = File.join(Dir.pwd, "log", "#{s_yaml_file}.log")
     o_root_node = create_node("Root")
@@ -66,6 +68,7 @@ class ScriptRunner
   end
   
   def execute_jobs(o_root_node, s_log_file)
+    o_root_job = nil
     o_root_node.each do |o_node|
       
       unless o_node.is_root?
@@ -94,6 +97,9 @@ class ScriptRunner
         else
           o_job.exec_cmd = s_cmd
         end
+        
+        # replace settings with job
+        o_node.content = o_job 
       when h_settings["Parallel"]
         o_job = ScriptParallelJob.new()
         o_job.exec_cmd = ""
@@ -102,12 +108,17 @@ class ScriptRunner
         o_job.exec_cmd = ""
       end
       
+      if o_node.is_root? 
+        o_root_job = o_job
+      end
+      o_job.node = o_node
       o_job.exec_lbl = h_settings["Label"]
       o_job.work_dir = h_settings["Directory"]
       puts "#{o_job.exec_lbl}, #{o_job.exec_cmd}"
     end
     
-    # TODO: o_root_node.run()
+    o_root_job.node.print_tree
+    o_root_job.run()
     
   end
 
