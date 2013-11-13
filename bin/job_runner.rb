@@ -1,11 +1,9 @@
-
 require 'java'
 
 java_import 'java.lang.Runnable'
 
 
 module Jobbable
-  
   
   attr_accessor :exec_lbl
   attr_accessor :exec_cmd
@@ -19,6 +17,7 @@ module Jobbable
   def before_run(); end
   
   def after_run(s_result=nil); end
+  
 end
 
 module BasicJobbable
@@ -28,7 +27,9 @@ module BasicJobbable
   def run()
     
     before_run()
+    
     s_result = ""
+    
     Dir.chdir(@work_dir) do 
       s_result = %x{#{@exec_cmd}}
     end  
@@ -46,7 +47,6 @@ module SerialJobbable
   include Jobbable
   
   def run()
-    #@node.print_tree
     before_run()
     @node.children do |o_child_node|
       o_child_node.content.run()
