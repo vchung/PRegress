@@ -1,0 +1,28 @@
+Serial: true
+
+Roll up Detail Sales History:
+    Command: 'Prevail8.exe'
+    Directory: 'd:/Prevail8'
+    User: 'NYC'
+    Program: 'gDtlRollUp'
+    SettingsLabel: 'WHSE_BOUND_BROOK'
+Generate Forecasts:
+    Parallel: true
+    Generate Forecasts (Channel 11): 
+        Command: 'Prevail8.exe'
+        Directory: 'd:/Prevail8'
+        User: 'NYC'
+        Program: 'gMdlFcstx'
+        SettingsLabel: 'CHAN_11'
+    Generate Forecasts (Channel 12):
+        Command: 'Prevail8.exe'
+        Directory: 'd:/Prevail8'
+        User: 'NYC'
+        Program: 'gMdlFcstx'
+        SettingsLabel: 'CHAN_12'
+    Generate Forecasts (Channel 13): 
+        Command: 'Prevail8.exe'
+        Directory: 'd:/Prevail8'
+        User: 'NYC'
+        Program: 'gMdlFcstx'
+        SettingsLabel: 'CHAN_13'

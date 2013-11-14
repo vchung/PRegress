@@ -1,7 +1,6 @@
 Command: 'Prevail8.exe'
 Directory: 'd:/Prevail8'
 User: 'NYC'
-Serial: true
 
 Roll up Detail Sales History:
     Program: 'gDtlRollUp'
@@ -9,7 +8,7 @@ Roll up Detail Sales History:
 Generate Forecasts:
     Program: 'gMdlFcstx'
     Parallel: true
-    Generate Forecasts (Channel 11):
+    Generate Forecasts (Channel 11): 
         SettingsLabel: 'CHAN_11'
     Generate Forecasts (Channel 12): 
         SettingsLabel: 'CHAN_12'

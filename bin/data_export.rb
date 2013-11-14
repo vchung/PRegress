@@ -23,6 +23,7 @@ class PRegress
     o_ora_driver = OracleDriver.new()
     DriverManager.registerDriver(o_ora_driver)
     @o_conn = DriverManager.get_connection(c_ora_url, c_ora_user, c_ora_pass)
+    
     # create connection to vfp table
     s_driver = "sun.jdbc.odbc.JdbcOdbcDriver"
     s_url = %Q{jdbc:odbc:Driver={#{o_ser_conn["vfp_driver"]}};SourceType=DBF;SourceDB=#{o_ser_conn["custom_folder"]};}
@@ -83,14 +84,12 @@ class PRegress
         o_job = PReParallelJob.new()
       else
         o_job = PReBasicJob.new(@o_conn)
+        o_job.run_id = n_run_id
+        o_job.job_id = n_job_id
+        o_job.node_id = n_node_id
+        o_job.exec_cmd = s_exec_cmd
+        o_job.work_dir = s_work_dir
       end
-      
-      o_job.exec_cmd = s_exec_cmd
-      o_job.work_dir = s_work_dir
-      o_job.job_type = s_job_type
-      o_job.run_id = n_run_id
-      o_job.job_id = n_job_id
-      o_job.node_id = n_node_id
       
       o_node = Tree::TreeNode.new(n_node_id.to_s, o_job)
       h_nodes[n_node_id] = o_node
@@ -105,8 +104,7 @@ class PRegress
     end
     
     o_root_job.run()
-    
-    
+   
   end
   
   def log_report_end(n_run_id)
@@ -119,8 +117,8 @@ class PRegress
     begin
       c_update_stmt.executeUpdate()
     rescue Exception => e
-    #puts e.message
-    #puts e.backtrace.inspect
+      puts e.message
+      puts e.backtrace.inspect
     end
     @o_conn.commit()
     @o_conn.close()
@@ -147,7 +145,6 @@ class PRegress
     end
   
     # insert new settings
-    # TODO: not sure whether to use job_id or node_id
     c_ins_sql = %Q{insert into custprop (scope, property, userid, value, memovalue, lock, type) values (?, ?, ?, ?, ?, ?, ?)}
     o_ins_stmt = @o_custom_conn.prepare_statement(c_ins_sql)
     o_ins_stmt.set_string(1, c_settings_scope)
@@ -189,7 +186,7 @@ class PRegress
     return n_run_id 
   end
   
-  def run_pregress(n_root_node_id) # ex: 1, 8, 12
+  def run_pregress(n_root_node_id) 
     
     n_run_id = get_run_id()
     log_report_start(n_run_id, n_root_node_id)
@@ -244,6 +241,10 @@ end
 class PReBasicJob
   include BasicJobbable
   include OraJobLoggable
+  
+  attr_accessor :run_id
+  attr_accessor :job_id
+  attr_accessor :node_id
   
   def initialize(o_conn)
     @o_conn = o_conn 

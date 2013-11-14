@@ -4,6 +4,7 @@ require 'bin/txt_job_loggable'
 require 'bin/job_runner'
 
 class ScriptRunner
+  include TxtJobLoggable
 
   attr_accessor :reserved_keywords
   attr_accessor :cur_node_id
@@ -12,20 +13,34 @@ class ScriptRunner
     @cur_node_id = 0
     @reserved_keywords = ["Command", "Directory", "Program", "User", "Serial", "Parallel", "Label"]
   end
-
-  def run_script(s_yaml_file)
-
-    raise "Yaml file name is not provided" if s_yaml_file.nil?
-    
-    h_config = YAML.load_file("app/#{s_yaml_file}.yml")
-    s_log_file = File.join(Dir.pwd, "log", "#{s_yaml_file}.log")
-    o_root_settings_node = create_settings_node("Root")
-    parse_script(o_root_settings_node, h_config)
-    process_settings(o_root_settings_node)
-    
-    o_root_job = build_job_tree(o_root_settings_node, s_log_file)
-    o_root_job.node.print_tree
+  
+  def run_script(o_root_job)
     o_root_job.run()
+  end
+
+  def setup(s_yaml_file)
+  
+    begin
+
+      raise "Yaml file name is not provided" if s_yaml_file.nil?
+      
+      h_config = YAML.load_file("app/#{s_yaml_file}.yml")
+      @log_file = File.join(Dir.pwd, "log", "#{s_yaml_file}.log")
+      o_root_settings_node = create_settings_node("Root")
+      parse_script(o_root_settings_node, h_config)
+      process_settings(o_root_settings_node)
+      
+      o_root_job = build_job_tree(o_root_settings_node)
+      
+      return o_root_job
+      
+    rescue Exception => o_exc
+      write_log("ERROR", "Batch job failed")
+      write_log("ERROR", o_exc.message)
+      write_log("ERROR", o_exc.inspect)
+      write_log("ERROR", o_exc.backtrace)
+      raise o_exc
+    end
   end
   
   def parse_script(o_node, h_settings)
@@ -63,9 +78,11 @@ class ScriptRunner
     
   end
   
-  def build_job_tree(o_settings_root_node, s_log_file)
+  def build_job_tree(o_settings_root_node)
+  
     h_nodes = {}
     o_root_job = nil
+    
     o_settings_root_node.each do |o_set_node|
       next if o_set_node.is_leaf?
       
@@ -79,23 +96,31 @@ class ScriptRunner
         o_set_node.content = o_par_set_node.content.merge(o_set_node.content) 
       end
       
-      o_job = create_job(o_set_node.node_height, o_set_node.content, s_log_file)
+      o_job = create_job(o_set_node.node_height, o_set_node.content, @log_file)
       o_job.node = o_node
       o_node.content = o_job
       o_root_job = o_job if o_node.is_root?
     end
+    
     return o_root_job
   end
   
   def create_job(n_node_height, h_settings, s_log_file)
+  
     case
-    when n_node_height == 1 && h_settings["Command"] == "Prevail8.exe"
+    when n_node_height == 1 && h_settings["Command"] == "Prevail8.exe" # TODO: check more options, use regular expression
       
-      o_job = ScriptBasicJob.new()
-      o_job.log_file = s_log_file
+      raise "Command undefined" unless h_settings.key? "Command"
+      raise "User name undefined" unless h_settings.key? "User"
+      raise "Program undefined" unless h_settings.key? "Program"
+      raise "Directory undefined" unless h_settings.key? "Directory"
+      
       s_cmd = h_settings["Command"]
       s_user = h_settings["User"]
       s_prg = h_settings["Program"]
+      
+      o_job = ScriptBasicJob.new()
+      o_job.log_file = s_log_file
       
       a_args = Array.new()
       h_settings.each do |s_key, s_value|
@@ -104,21 +129,30 @@ class ScriptRunner
         end
       end
       
-      o_job.exec_cmd = %Q{#{s_cmd} #{s_user} #{s_prg} "#{a_args.join(" ")}"}
-    when n_node_height == 1
-      o_job = ScriptBasicJob.new()
-      o_job.exec_cmd = s_cmd
+      # prevail always expects arg
+      raise "Argument not found" if a_args.empty?
+     
       o_job.log_file = s_log_file
+      o_job.exec_cmd = %Q{#{s_cmd} #{s_user} #{s_prg} "#{a_args.join(" ")}"}
+      o_job.exec_lbl = h_settings["Label"]
+      o_job.work_dir = h_settings["Directory"]
+      
+    when n_node_height == 1
+    
+      raise "Command undefined" unless h_settings.key? "Command"
+      raise "Directory undefined" unless h_settings.key? "Directory"
+      
+      o_job = ScriptBasicJob.new()
+      o_job.log_file = s_log_file
+      o_job.exec_cmd = %x{#{s_cmd} 2>&1}
+      o_job.exec_lbl = h_settings["Label"]
+      o_job.work_dir = h_settings["Directory"]  
+      
     when h_settings["Parallel"]
       o_job = ScriptParallelJob.new()
-      o_job.exec_cmd = ""
     else
       o_job = ScriptSerialJob.new()
-      o_job.exec_cmd = ""
     end
-    
-    o_job.exec_lbl = h_settings["Label"]
-    o_job.work_dir = h_settings["Directory"]  
     
     return o_job
   end
@@ -138,6 +172,8 @@ class ScriptBasicJob
   include BasicJobbable
   include TxtJobLoggable
   
+  attr_accessor :exec_lbl
+  
   def before_run()
     write_log("INFO", "#{@exec_lbl} started")
   end
@@ -149,5 +185,7 @@ class ScriptBasicJob
   end
 end
 
-ScriptRunner.new().run_script(ARGV[0])
+o_runner = ScriptRunner.new()
+o_job = o_runner.setup(ARGV[0])
+o_runner.run_script(o_job)
 

@@ -7,11 +7,13 @@ Roll up Detail Sales History:
     Program: 'gDtlRollUp'
     SettingsLabel: 'WHSE_BOUND_BROOK'
 Generate Forecasts:
-    Program: 'gMdlFcstx'
     Parallel: true
-    Generate Forecasts (Channel 11):
+    Generate Forecasts (Channel 11): 
+        Program: 'gMdlFcstx'
         SettingsLabel: 'CHAN_11'
     Generate Forecasts (Channel 12): 
+        Program: 'gMdlFcstx'
         SettingsLabel: 'CHAN_12'
     Generate Forecasts (Channel 13): 
+        Program: 'gMdlFcstx'
         SettingsLabel: 'CHAN_13'
