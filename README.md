@@ -1,3 +1,3 @@
 PRegress
 ============
-This is my first ruby project!
+Automation Performance Regression Testing System
